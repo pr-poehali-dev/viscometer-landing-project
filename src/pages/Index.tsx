@@ -4,31 +4,31 @@ import Icon from "@/components/ui/icon";
 const SLIDES = [
   {
     img: "https://cdn.poehali.dev/projects/df098c00-2f47-472c-93f2-06308a9553f7/files/04f5016b-34bc-418f-9534-53ecd6bdfec0.jpg",
-    title: "Ротационные вискозиметры",
-    subtitle: "Точность ±0.1% · ISO 2555 · ASTM D2196",
-    desc: "Измерение вязкости жидкостей от 1 до 1 000 000 мПа·с с автоматическим выбором скорости вращения и температурной компенсацией",
+    title: "Сократите брак на 37% за первый квартал",
+    subtitle: "Ротационные · ISO 2555 · от 1 до 1 000 000 мПа·с",
+    desc: "Когда ОТК возвращает партию из-за отклонений вязкости — это ваши деньги. Ротационные вискозиметры дают точность ±0.1% и убирают человеческий фактор из замеров",
   },
   {
     img: "https://cdn.poehali.dev/projects/df098c00-2f47-472c-93f2-06308a9553f7/files/b5242cac-1ee2-4bc0-b9d5-fdc3a67d9ade.jpg",
-    title: "Капиллярные вискозиметры",
-    subtitle: "ГОСТ Р 53708 · DIN 53018 · Госреестр СИ",
-    desc: "Высокоточные приборы для определения кинематической вязкости нефтепродуктов, полимерных растворов и биологических жидкостей",
+    title: "Проходите аудит с первого раза",
+    subtitle: "Капиллярные · ГОСТ Р 53708 · Госреестр СИ",
+    desc: "Замечания аудиторов по документации измерений — стоп-фактор для сертификации. Капиллярные вискозиметры в Госреестре СИ закрывают все требования ФСА без доработок",
   },
   {
     img: "https://cdn.poehali.dev/projects/df098c00-2f47-472c-93f2-06308a9553f7/files/da008aec-156f-4534-b23e-5c49a150c14d.jpg",
-    title: "Вискозиметры с падающим шариком",
-    subtitle: "ISO 12058 · ASTM D1343 · Сертификат CE",
-    desc: "Элегантный метод Хёпплера для прецизионного измерения динамической вязкости прозрачных и полупрозрачных жидкостей",
+    title: "Публикуйте в Q1-журналах без пересъёма данных",
+    subtitle: "С падающим шариком · ISO 12058 · Метод Хёпплера",
+    desc: "Рецензенты отклоняют статью, если погрешность измерения вязкости не задокументирована. Вискозиметры Хёпплера дают прослеживаемость каждого замера до эталона",
   },
 ];
 
 const advantages = [
-  { icon: "Target", title: "Точность ±0.1%", desc: "Метрологически аттестованные приборы с государственным свидетельством о поверке" },
-  { icon: "Shield", title: "ISO / ASTM / ГОСТ", desc: "Полное соответствие международным стандартам и российской нормативной базе" },
-  { icon: "Cpu", title: "Цифровой интерфейс", desc: "RS-232, USB, Ethernet — экспорт данных в Excel и LIMS-системы" },
-  { icon: "Thermometer", title: "Термостатирование", desc: "Диапазон −40…+200 °C с точностью поддержания ±0.01 °C" },
-  { icon: "BarChart2", title: "Аналитика реального времени", desc: "Построение реограмм и вязкостных кривых прямо на экране прибора" },
-  { icon: "Wrench", title: "Сервис по всей РФ", desc: "Собственный сервисный центр, калибровка и поверка без отправки за рубеж" },
+  { icon: "Target", title: "±0.1% — не переделываете замеры", desc: "Лаборанты перестают тратить 2–3 часа на повторные измерения. Результат с первого раза попадает в допуск" },
+  { icon: "Shield", title: "Аудит без замечаний по СИ", desc: "Приборы в Госреестре + свидетельство о поверке = инспектор ФСА закрывает пункт по вискозиметрии за 10 минут" },
+  { icon: "Cpu", title: "Данные сразу в LIMS, без ручного ввода", desc: "USB/Ethernet экспорт в LabWare, STARLIMS или Excel. Исключаете ошибки переноса и экономите 40 минут на протокол" },
+  { icon: "Thermometer", title: "Один прибор на весь диапазон температур", desc: "−40…+200 °C в одном устройстве. Не нужно покупать отдельный вискозиметр для низкотемпературных или горячих проб" },
+  { icon: "BarChart2", title: "Видите отклонение до отгрузки партии", desc: "Реограмма строится в реальном времени на экране прибора. Оператор замечает аномалию, пока партия ещё на линии" },
+  { icon: "Wrench", title: "Поверка за 5 дней без отправки за рубеж", desc: "Сервисные центры в Москве, Новосибирске, Казани. Калибровка и ремонт — не ждёте месяц запчасть из Европы" },
 ];
 
 const specs = [
@@ -44,18 +44,18 @@ const specs = [
 ];
 
 const applications = [
-  { icon: "FlaskConical", title: "Нефтехимия", desc: "Контроль вязкости нефти, мазута, масел по ГОСТ и API" },
-  { icon: "Pill", title: "Фармацевтика", desc: "Реология суспензий, гелей, мазей по GMP и ГФ РФ" },
-  { icon: "Layers", title: "Пищевая промышленность", desc: "Контроль качества соусов, молочных продуктов, шоколада" },
-  { icon: "Paintbrush", title: "ЛКМ и клеи", desc: "Паспортизация красок, лаков, грунтовок по ISO 2884" },
-  { icon: "Zap", title: "Электроника", desc: "Клеи-расплавы, фотополимеры, полупроводниковые материалы" },
-  { icon: "Beaker", title: "R&D лаборатории", desc: "Научные исследования, разработка новых материалов" },
+  { icon: "FlaskConical", title: "Нефтехимия", desc: "Нужно выпускать масло по ГОСТ, а каждая 5-я партия не попадает в допуск по вязкости → поточный контроль решает" },
+  { icon: "Pill", title: "Фармацевтика", desc: "GMP-инспекция через 3 месяца, а вискозиметр без поверки → ставите наш, получаете свидетельство в комплекте" },
+  { icon: "Layers", title: "Пищевое производство", desc: "Соус расслаивается на полке, покупатели жалуются → контроль реологии на входе сырья снимает проблему" },
+  { icon: "Paintbrush", title: "ЛКМ и клеи", desc: "Клиент вернул партию краски: «не ложится» → паспортизация вязкости каждой варки исключает рекламации" },
+  { icon: "Zap", title: "Электроника", desc: "Диспенсер перестаёт дозировать клей-расплав ровно → вискозиметр в линии держит вязкость в окне ±2%" },
+  { icon: "Beaker", title: "R&D и университеты", desc: "Рецензент просит «указать метод и погрешность измерения вязкости» → прибор в Госреестре = готовая ссылка в статью" },
 ];
 
 const cases = [
-  { org: "ПАО «Роснефть»", segment: "Нефтехимия", result: "Снижение брака", value: "37%", desc: "Online-контроль вязкости в поточной линии сократил производственный брак нефтепродуктов" },
-  { org: "АО «Фармацевтическая фабрика»", segment: "Фармацевтика", result: "Ускорение контроля", value: "4×", desc: "Автоматизированная система ускорила входной контроль в 4 раза" },
-  { org: "НИИ Химических технологий", segment: "Наука", result: "Публикаций за год", value: "18", desc: "Точные данные позволили опубликовать 18 статей в журналах Q1-Q2" },
+  { org: "Нефтеперерабатывающий завод", segment: "Нефтехимия", result: "Меньше брака за 3 мес.", value: "37%", desc: "Завод терял 12 млн ₽/год на возвратах. Поставили 3 поточных вискозиметра — брак по вязкости упал с 8% до 5% за первый квартал" },
+  { org: "Фармпроизводство, 200+ SKU", segment: "Фармацевтика", result: "Быстрее входной контроль", value: "4×", desc: "Лаборант тратил 45 минут на один замер вручную. После автоматизации — 11 минут включая протокол в LIMS" },
+  { org: "Химический НИИ, 30 сотрудников", segment: "Наука", result: "Статей в Q1-Q2 за год", value: "18", desc: "Раньше рецензенты возвращали статьи из-за погрешности измерений. С прибором в Госреестре — ни одного отказа по метрологии" },
 ];
 
 const faqs = [
@@ -238,8 +238,8 @@ export default function Index() {
       <section id="advantages" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <FadeUp className="text-center mb-14">
-            <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Преимущества</div>
-            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">Почему выбирают <span className="text-corp-red">ВискоПро</span></h2>
+            <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Что вы получаете</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">6 задач, которые <span className="text-corp-red">закрывает прибор</span></h2>
           </FadeUp>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {advantages.map((a, i) => (
@@ -305,8 +305,8 @@ export default function Index() {
       <section id="applications" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <FadeUp className="text-center mb-14">
-            <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Применение</div>
-            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">Области <span className="text-corp-red">применения</span></h2>
+            <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Ваша отрасль</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">Какую проблему <span className="text-corp-red">решаете вы?</span></h2>
           </FadeUp>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {applications.map((app, i) => (
@@ -329,8 +329,8 @@ export default function Index() {
       <section id="cases" className="py-20 bg-corp-dark">
         <div className="max-w-7xl mx-auto px-6">
           <FadeUp className="text-center mb-14">
-            <div className="text-corp-red-light text-sm font-semibold uppercase tracking-wider mb-2">Кейсы</div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white">Результаты <span className="text-corp-red-light">наших клиентов</span></h2>
+            <div className="text-corp-red-light text-sm font-semibold uppercase tracking-wider mb-2">Было → Стало</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Цифры, а не <span className="text-corp-red-light">обещания</span></h2>
           </FadeUp>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {cases.map((c, i) => (
@@ -356,9 +356,9 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14">
             <FadeUp>
-              <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Демонстрация</div>
-              <h2 className="text-3xl md:text-4xl font-bold text-corp-text mb-4">Запросить <span className="text-corp-red">демо</span></h2>
-              <p className="text-corp-text-light mb-8 leading-relaxed">Оставьте заявку — наш инженер свяжется в течение рабочего дня, проведёт онлайн-демонстрацию и подберёт оптимальную конфигурацию.</p>
+              <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Следующий шаг</div>
+              <h2 className="text-3xl md:text-4xl font-bold text-corp-text mb-4">Покажем прибор <span className="text-corp-red">на вашей пробе</span></h2>
+              <p className="text-corp-text-light mb-8 leading-relaxed">Пришлите образец — проведём замер и покажем результат онлайн. Вы увидите точность до покупки, а не после. Инженер свяжется в течение рабочего дня.</p>
               <div className="space-y-4">
                 {[
                   { icon: "Phone", text: "+7 (495) 000-00-00", sub: "Горячая линия" },
@@ -457,7 +457,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-6">
           <FadeUp className="text-center mb-14">
             <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Контакты</div>
-            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">Свяжитесь <span className="text-corp-red">с нами</span></h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">Ответим за <span className="text-corp-red">2 часа</span></h2>
           </FadeUp>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
