@@ -1,76 +1,34 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Icon from "@/components/ui/icon";
 
-const HERO_IMAGE = "https://cdn.poehali.dev/projects/df098c00-2f47-472c-93f2-06308a9553f7/files/ad7520ee-edda-44b6-87a6-960d4795393f.jpg";
-const LAB_IMAGE = "https://cdn.poehali.dev/projects/df098c00-2f47-472c-93f2-06308a9553f7/files/7070331c-935a-4c64-85de-c777beaa3e90.jpg";
-
-function useCountUp(target: number, duration = 2000, start = false) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!start) return;
-    let startTime: number | null = null;
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      setCount(Math.floor(progress * target));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [target, duration, start]);
-  return count;
-}
-
-function useInView(threshold = 0.2) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [threshold]);
-  return { ref, inView };
-}
-
-function StatCard({ value, unit, label, delay = 0 }: { value: number; unit: string; label: string; delay?: number }) {
-  const { ref, inView } = useInView();
-  const count = useCountUp(value, 1800, inView);
-  return (
-    <div
-      ref={ref}
-      className="text-center"
-      style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: `all 0.6s ease ${delay}ms` }}
-    >
-      <div className="font-mono text-4xl md:text-5xl font-medium text-lab-amber leading-none">
-        {count}{unit}
-      </div>
-      <div className="mt-2 text-lab-steel text-sm uppercase tracking-widest">{label}</div>
-    </div>
-  );
-}
-
-function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-  const { ref, inView } = useInView(0.15);
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(30px)", transition: `all 0.7s ease ${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-}
+const SLIDES = [
+  {
+    img: "https://cdn.poehali.dev/projects/df098c00-2f47-472c-93f2-06308a9553f7/files/04f5016b-34bc-418f-9534-53ecd6bdfec0.jpg",
+    title: "Ротационные вискозиметры",
+    subtitle: "Точность ±0.1% · ISO 2555 · ASTM D2196",
+    desc: "Измерение вязкости жидкостей от 1 до 1 000 000 мПа·с с автоматическим выбором скорости вращения и температурной компенсацией",
+  },
+  {
+    img: "https://cdn.poehali.dev/projects/df098c00-2f47-472c-93f2-06308a9553f7/files/b5242cac-1ee2-4bc0-b9d5-fdc3a67d9ade.jpg",
+    title: "Капиллярные вискозиметры",
+    subtitle: "ГОСТ Р 53708 · DIN 53018 · Госреестр СИ",
+    desc: "Высокоточные приборы для определения кинематической вязкости нефтепродуктов, полимерных растворов и биологических жидкостей",
+  },
+  {
+    img: "https://cdn.poehali.dev/projects/df098c00-2f47-472c-93f2-06308a9553f7/files/da008aec-156f-4534-b23e-5c49a150c14d.jpg",
+    title: "Вискозиметры с падающим шариком",
+    subtitle: "ISO 12058 · ASTM D1343 · Сертификат CE",
+    desc: "Элегантный метод Хёпплера для прецизионного измерения динамической вязкости прозрачных и полупрозрачных жидкостей",
+  },
+];
 
 const advantages = [
   { icon: "Target", title: "Точность ±0.1%", desc: "Метрологически аттестованные приборы с государственным свидетельством о поверке" },
-  { icon: "Shield", title: "ISO / ASTM / ГОСТ", desc: "Полное соответствие международным стандартам и требованиям российской нормативной базы" },
-  { icon: "Cpu", title: "Цифровой интерфейс", desc: "RS-232/USB/Ethernet выходы, экспорт данных в Excel и LIMS-системы" },
-  { icon: "Thermometer", title: "Термостатирование", desc: "Диапазон рабочих температур −40…+200 °C с точностью поддержания ±0.01 °C" },
-  { icon: "BarChart2", title: "Аналитика в реальном времени", desc: "Автоматическое построение реограмм и вязкостных кривых прямо на экране прибора" },
-  { icon: "Wrench", title: "Сервис в России", desc: "Собственный сервисный центр, калибровка и поверка без отправки за рубеж" },
+  { icon: "Shield", title: "ISO / ASTM / ГОСТ", desc: "Полное соответствие международным стандартам и российской нормативной базе" },
+  { icon: "Cpu", title: "Цифровой интерфейс", desc: "RS-232, USB, Ethernet — экспорт данных в Excel и LIMS-системы" },
+  { icon: "Thermometer", title: "Термостатирование", desc: "Диапазон −40…+200 °C с точностью поддержания ±0.01 °C" },
+  { icon: "BarChart2", title: "Аналитика реального времени", desc: "Построение реограмм и вязкостных кривых прямо на экране прибора" },
+  { icon: "Wrench", title: "Сервис по всей РФ", desc: "Собственный сервисный центр, калибровка и поверка без отправки за рубеж" },
 ];
 
 const specs = [
@@ -86,155 +44,212 @@ const specs = [
 ];
 
 const applications = [
-  { icon: "FlaskConical", title: "Нефтехимия", desc: "Контроль вязкости нефти, мазута, смазочных масел и нефтепродуктов по ГОСТ и API стандартам" },
-  { icon: "Pill", title: "Фармацевтика", desc: "Измерение реологических свойств суспензий, гелей, мазей согласно требованиям GMP и ГФ РФ" },
-  { icon: "Layers", title: "Пищевая промышленность", desc: "Контроль качества соусов, сиропов, молочных продуктов, шоколада и кондитерских масс" },
-  { icon: "Paintbrush", title: "Лакокрасочная отрасль", desc: "Паспортизация красок, лаков, грунтовок и клеёв. Соответствие ISO 2884 и DIN 53018" },
-  { icon: "Zap", title: "Электроника и химия", desc: "Клеи-расплавы, фотополимеры, смолы, гальванические электролиты и полупроводниковые материалы" },
-  { icon: "Beaker", title: "Научные исследования", desc: "R&D лаборатории, университеты, испытательные центры, разработка новых материалов" },
+  { icon: "FlaskConical", title: "Нефтехимия", desc: "Контроль вязкости нефти, мазута, масел по ГОСТ и API" },
+  { icon: "Pill", title: "Фармацевтика", desc: "Реология суспензий, гелей, мазей по GMP и ГФ РФ" },
+  { icon: "Layers", title: "Пищевая промышленность", desc: "Контроль качества соусов, молочных продуктов, шоколада" },
+  { icon: "Paintbrush", title: "ЛКМ и клеи", desc: "Паспортизация красок, лаков, грунтовок по ISO 2884" },
+  { icon: "Zap", title: "Электроника", desc: "Клеи-расплавы, фотополимеры, полупроводниковые материалы" },
+  { icon: "Beaker", title: "R&D лаборатории", desc: "Научные исследования, разработка новых материалов" },
 ];
 
 const cases = [
-  { org: "ПАО «Роснефть»", segment: "Нефтехимия", result: "Снижение брака", value: "37%", desc: "Внедрение online-контроля вязкости в поточной линии сократило производственный брак нефтепродуктов" },
-  { org: "АО «Фармацевтическая фабрика»", segment: "Фармацевтика", result: "Ускорение контроля", value: "4×", desc: "Замена вискозиметра Брукфилда на автоматизированную систему ускорила входной контроль в 4 раза" },
-  { org: "НИИ Химических технологий", segment: "Наука", result: "Публикаций за год", value: "18", desc: "Точные реологические данные позволили опубликовать 18 научных статей в журналах Q1-Q2 за год" },
+  { org: "ПАО «Роснефть»", segment: "Нефтехимия", result: "Снижение брака", value: "37%", desc: "Online-контроль вязкости в поточной линии сократил производственный брак нефтепродуктов" },
+  { org: "АО «Фармацевтическая фабрика»", segment: "Фармацевтика", result: "Ускорение контроля", value: "4×", desc: "Автоматизированная система ускорила входной контроль в 4 раза" },
+  { org: "НИИ Химических технологий", segment: "Наука", result: "Публикаций за год", value: "18", desc: "Точные данные позволили опубликовать 18 статей в журналах Q1-Q2" },
 ];
 
 const faqs = [
-  { q: "Как быстро проводится поверка прибора?", a: "Первичная поверка входит в поставку. Периодическая — раз в 1–2 года в нашем аккредитованном центре, срок 3–5 рабочих дней." },
-  { q: "Можно ли интегрировать вискозиметр с LIMS?", a: "Да. Все приборы поддерживают открытые протоколы (Modbus, OPC-UA) и имеют готовые коннекторы к популярным LIMS: LabWare, STARLIMS, Labvantage." },
-  { q: "Какие условия гарантии?", a: "24 месяца на прибор и термостат. При обнаружении заводского дефекта — замена в течение 10 рабочих дней. Сервис осуществляется на территории России." },
-  { q: "Возможна ли аренда или лизинг?", a: "Да. Работаем через ведущие лизинговые компании (Сбербанк Лизинг, ВТБ Лизинг). Также доступна операционная аренда на 3–24 месяца." },
-  { q: "Есть ли обучение для лаборантов?", a: "Базовый инструктаж включён в поставку. Сертификационные курсы для операторов — 1–2 дня онлайн или очно в Москве." },
+  { q: "Как быстро проводится поверка прибора?", a: "Первичная поверка входит в поставку. Периодическая — раз в 1–2 года, срок 3–5 рабочих дней." },
+  { q: "Можно ли интегрировать вискозиметр с LIMS?", a: "Да, все приборы поддерживают Modbus, OPC-UA и имеют коннекторы к LabWare, STARLIMS, Labvantage." },
+  { q: "Какие условия гарантии?", a: "24 месяца на прибор. При заводском дефекте — замена в течение 10 рабочих дней." },
+  { q: "Возможна ли аренда или лизинг?", a: "Да, работаем через Сбербанк Лизинг, ВТБ Лизинг. Аренда на 3–24 месяца." },
+  { q: "Есть ли обучение для лаборантов?", a: "Базовый инструктаж включён. Сертификационные курсы — 1–2 дня онлайн или очно." },
 ];
 
-const [navOpen, setNavOpen] = [false, () => {}];
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, inView };
+}
+
+function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const { ref, inView } = useInView();
+  return (
+    <div ref={ref} className={className} style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(24px)", transition: `all 0.6s cubic-bezier(.22,.61,.36,1) ${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
+function useCountUp(target: number, dur = 1800, start = false) {
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    if (!start) return;
+    let t0: number | null = null;
+    const step = (ts: number) => {
+      if (!t0) t0 = ts;
+      const p = Math.min((ts - t0) / dur, 1);
+      setV(Math.floor(p * target));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [target, dur, start]);
+  return v;
+}
+
+function StatBlock({ value, unit, label, delay = 0 }: { value: number; unit: string; label: string; delay?: number }) {
+  const { ref, inView } = useInView();
+  const c = useCountUp(value, 1600, inView);
+  return (
+    <div ref={ref} className="text-center" style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(16px)", transition: `all 0.5s ease ${delay}ms` }}>
+      <div className="text-4xl md:text-5xl font-extrabold text-corp-red leading-none">{c}{unit}</div>
+      <div className="mt-2 text-corp-text-light text-sm">{label}</div>
+    </div>
+  );
+}
 
 export default function Index() {
+  const [slide, setSlide] = useState(0);
   const [mobileNav, setMobileNav] = useState(false);
-  const [formData, setFormData] = useState({ name: "", org: "", phone: "", email: "", message: "" });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [formData, setFormData] = useState({ name: "", org: "", phone: "", email: "", message: "" });
   const [formSent, setFormSent] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval>>();
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setMobileNav(false);
-  };
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormSent(true);
-  };
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), 5000);
+  }, []);
+
+  useEffect(() => { resetTimer(); return () => { if (timerRef.current) clearInterval(timerRef.current); }; }, [resetTimer]);
+
+  const goSlide = (i: number) => { setSlide(i); resetTimer(); };
+  const scrollTo = (id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setMobileNav(false); };
+  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); setFormSent(true); };
 
   return (
-    <div className="min-h-screen bg-lab-navy font-ibm text-lab-steel-light overflow-x-hidden">
+    <div className="min-h-screen bg-white font-ibm text-corp-text overflow-x-hidden">
 
-      {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-lab-navy/90 backdrop-blur-md border-b border-lab-steel-muted/20">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-lab-amber rounded-sm flex items-center justify-center">
-              <Icon name="Gauge" size={18} className="text-lab-navy" />
-            </div>
-            <span className="font-mono text-white font-medium tracking-tight text-lg">ВИСКОПРО</span>
+      <div className="bg-corp-dark text-white/80 text-xs">
+        <div className="max-w-7xl mx-auto px-6 py-2 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-6">
+            <span className="flex items-center gap-1.5"><Icon name="Phone" size={12} className="text-corp-red-light" /> +7 (495) 000-00-00</span>
+            <span className="hidden sm:flex items-center gap-1.5"><Icon name="Mail" size={12} className="text-corp-red-light" /> info@viskopro.ru</span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm text-lab-steel">
-            {[["advantages","Преимущества"],["specs","Характеристики"],["applications","Применение"],["cases","Кейсы"],["contacts","Контакты"]].map(([id, label]) => (
-              <button key={id} onClick={() => scrollTo(id)} className="hover:text-lab-amber transition-colors duration-200">{label}</button>
+          <span className="flex items-center gap-1.5"><Icon name="Clock" size={12} className="text-corp-red-light" /> Пн–Пт 9:00–18:00</span>
+        </div>
+      </div>
+
+      <nav className={`sticky top-0 z-50 bg-white transition-shadow duration-300 ${scrolled ? "shadow-lg" : "shadow-sm"}`}>
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-corp-red rounded-lg flex items-center justify-center">
+              <Icon name="Gauge" size={20} className="text-white" />
+            </div>
+            <div>
+              <span className="font-bold text-corp-text text-lg leading-none tracking-tight">ВИСКОПРО</span>
+              <div className="text-[10px] text-corp-text-muted leading-none mt-0.5">вискозиметры для лабораторий</div>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-7 text-sm font-medium text-corp-text-light">
+            {[["advantages","Преимущества"],["specs","Характеристики"],["applications","Применение"],["cases","Кейсы"],["faq","FAQ"],["contacts","Контакты"]].map(([id, label]) => (
+              <button key={id} onClick={() => scrollTo(id)} className="hover:text-corp-red transition-colors">{label}</button>
             ))}
           </div>
-          <button onClick={() => scrollTo("order")} className="hidden md:block bg-lab-amber text-lab-navy text-sm font-semibold px-5 py-2 rounded hover:bg-lab-amber-light transition-colors duration-200">
-            Запросить демо
+
+          <button onClick={() => scrollTo("order")} className="hidden lg:flex items-center gap-2 bg-corp-red text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-corp-red-dark transition-colors">
+            <Icon name="Send" size={15} /> Запросить демо
           </button>
-          <button className="md:hidden text-lab-steel" onClick={() => setMobileNav(!mobileNav)}>
-            <Icon name={mobileNav ? "X" : "Menu"} size={22} />
+
+          <button className="lg:hidden text-corp-text" onClick={() => setMobileNav(!mobileNav)}>
+            <Icon name={mobileNav ? "X" : "Menu"} size={24} />
           </button>
         </div>
         {mobileNav && (
-          <div className="md:hidden bg-lab-navy-light border-t border-lab-steel-muted/20 px-6 py-4 flex flex-col gap-4 text-sm">
-            {[["advantages","Преимущества"],["specs","Характеристики"],["applications","Применение"],["cases","Кейсы"],["order","Заказать демо"],["contacts","Контакты"]].map(([id, label]) => (
-              <button key={id} onClick={() => scrollTo(id)} className="text-left text-lab-steel hover:text-lab-amber transition-colors">{label}</button>
+          <div className="lg:hidden border-t px-6 py-4 flex flex-col gap-3 bg-white shadow-lg text-sm">
+            {[["advantages","Преимущества"],["specs","Характеристики"],["applications","Применение"],["cases","Кейсы"],["faq","FAQ"],["contacts","Контакты"],["order","Запросить демо"]].map(([id, label]) => (
+              <button key={id} onClick={() => scrollTo(id)} className="text-left text-corp-text-light hover:text-corp-red transition-colors py-1">{label}</button>
             ))}
           </div>
         )}
       </nav>
 
-      {/* HERO */}
-      <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={HERO_IMAGE} alt="Вискозиметр" className="w-full h-full object-cover opacity-25" />
-          <div className="absolute inset-0 bg-gradient-to-r from-lab-navy via-lab-navy/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-lab-navy via-transparent to-transparent" />
-          <div className="absolute inset-0 opacity-5" style={{backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 39px, #8ba3c7 39px, #8ba3c7 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, #8ba3c7 39px, #8ba3c7 40px)"}} />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-6 py-24">
-          <div className="max-w-2xl">
-            <div
-              className="inline-flex items-center gap-2 bg-lab-amber/10 border border-lab-amber/30 text-lab-amber text-xs font-mono uppercase tracking-widest px-3 py-1.5 rounded mb-8"
-              style={{ animation: "fade-up 0.6s ease-out forwards" }}
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-lab-amber animate-pulse" />
-              Соответствие ISO · ASTM · ГОСТ
+      <section className="relative bg-corp-gray overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 py-12 md:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center min-h-[420px]">
+            <div key={slide} style={{ animation: "fade-up 0.5s ease-out forwards" }}>
+              <div className="inline-flex items-center gap-2 bg-corp-red/10 text-corp-red text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full mb-5">
+                <div className="w-1.5 h-1.5 rounded-full bg-corp-red" />
+                {SLIDES[slide].subtitle}
+              </div>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-corp-text leading-tight mb-5">
+                {SLIDES[slide].title}
+              </h1>
+              <p className="text-corp-text-light text-lg leading-relaxed mb-8 max-w-lg">
+                {SLIDES[slide].desc}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <button onClick={() => scrollTo("order")} className="bg-corp-red text-white font-semibold px-7 py-3.5 rounded-lg hover:bg-corp-red-dark transition-all hover:scale-105 text-sm">
+                  Запросить демонстрацию
+                </button>
+                <button onClick={() => scrollTo("specs")} className="border-2 border-corp-gray-mid text-corp-text-light font-semibold px-7 py-3.5 rounded-lg hover:border-corp-red hover:text-corp-red transition-all text-sm">
+                  Подробнее
+                </button>
+              </div>
             </div>
 
-            <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-light text-white leading-tight mb-6"
-              style={{ animation: "fade-up 0.7s ease-out 0.1s both" }}
-            >
-              Измерения,<br />
-              <span className="text-lab-amber font-semibold">которым<br />доверяют</span>
-            </h1>
-
-            <p
-              className="text-lab-steel text-lg md:text-xl leading-relaxed mb-10 max-w-xl"
-              style={{ animation: "fade-up 0.7s ease-out 0.2s both" }}
-            >
-              Профессиональные вискозиметры для аналитических, производственных и исследовательских лабораторий. Точность ±0.1%, полная метрологическая прослеживаемость.
-            </p>
-
-            <div
-              className="flex flex-wrap gap-4"
-              style={{ animation: "fade-up 0.7s ease-out 0.3s both" }}
-            >
-              <button onClick={() => scrollTo("order")} className="bg-lab-amber text-lab-navy font-semibold px-8 py-4 rounded text-base hover:bg-lab-amber-light transition-all duration-200 hover:scale-105">
-                Запросить демонстрацию
-              </button>
-              <button onClick={() => scrollTo("specs")} className="border border-lab-steel-muted text-lab-steel-light px-8 py-4 rounded text-base hover:border-lab-amber hover:text-lab-amber transition-all duration-200">
-                Технические характеристики
-              </button>
+            <div className="relative flex items-center justify-center" key={`img-${slide}`} style={{ animation: "fade-in 0.6s ease-out forwards" }}>
+              <img src={SLIDES[slide].img} alt={SLIDES[slide].title} className="w-full max-w-md rounded-2xl shadow-2xl object-cover aspect-square" />
             </div>
           </div>
-        </div>
 
-        {/* STATS BAR */}
-        <div className="absolute bottom-0 left-0 right-0 bg-lab-navy-light/80 backdrop-blur border-t border-lab-steel-muted/20">
-          <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <StatCard value={500} unit="+" label="Лабораторий по РФ" />
-            <StatCard value={15} unit=" лет" label="На рынке" delay={100} />
-            <StatCard value={99} unit=".9%" label="Uptime приборов" delay={200} />
-            <StatCard value={24} unit=" ч" label="Сервисная поддержка" delay={300} />
+          <div className="flex items-center justify-center gap-3 mt-10">
+            {SLIDES.map((_, i) => (
+              <button key={i} onClick={() => goSlide(i)} className={`h-2.5 rounded-full transition-all duration-300 ${i === slide ? "w-10 bg-corp-red" : "w-2.5 bg-corp-gray-mid hover:bg-corp-text-muted"}`} />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ADVANTAGES */}
-      <section id="advantages" className="py-24 bg-lab-navy">
-        <div className="max-w-7xl mx-auto px-6">
-          <FadeUp className="mb-16">
-            <div className="font-mono text-lab-amber text-xs uppercase tracking-widest mb-3">// 01 Преимущества</div>
-            <h2 className="text-3xl md:text-4xl font-light text-white">Почему выбирают <span className="text-lab-amber">ВискоПро</span></h2>
-          </FadeUp>
+      <section className="py-12 bg-white border-y border-corp-gray-mid">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <StatBlock value={500} unit="+" label="Лабораторий по России" />
+          <StatBlock value={15} unit=" лет" label="На рынке" delay={100} />
+          <StatBlock value={99} unit=".9%" label="Uptime приборов" delay={200} />
+          <StatBlock value={24} unit="/7" label="Техподдержка" delay={300} />
+        </div>
+      </section>
 
+      <section id="advantages" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <FadeUp className="text-center mb-14">
+            <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Преимущества</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">Почему выбирают <span className="text-corp-red">ВискоПро</span></h2>
+          </FadeUp>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {advantages.map((adv, i) => (
-              <FadeUp key={i} delay={i * 80}>
-                <div className="group p-6 bg-lab-navy-light border border-lab-steel-muted/20 rounded-lg hover:border-lab-amber/40 transition-all duration-300 hover:bg-lab-navy-mid/50 h-full">
-                  <div className="w-10 h-10 bg-lab-amber/10 rounded flex items-center justify-center mb-4 group-hover:bg-lab-amber/20 transition-colors">
-                    <Icon name={adv.icon} size={20} className="text-lab-amber" />
+            {advantages.map((a, i) => (
+              <FadeUp key={i} delay={i * 70}>
+                <div className="group p-6 bg-corp-gray rounded-xl border border-transparent hover:border-corp-red/20 hover:shadow-lg transition-all duration-300 h-full">
+                  <div className="w-12 h-12 bg-corp-red/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-corp-red transition-colors duration-300">
+                    <Icon name={a.icon} size={22} className="text-corp-red group-hover:text-white transition-colors duration-300" />
                   </div>
-                  <h3 className="text-white font-semibold mb-2">{adv.title}</h3>
-                  <p className="text-lab-steel text-sm leading-relaxed">{adv.desc}</p>
+                  <h3 className="text-corp-text font-bold text-lg mb-2">{a.title}</h3>
+                  <p className="text-corp-text-light text-sm leading-relaxed">{a.desc}</p>
                 </div>
               </FadeUp>
             ))}
@@ -242,37 +257,44 @@ export default function Index() {
         </div>
       </section>
 
-      {/* SPECS */}
-      <section id="specs" className="py-24 bg-lab-navy-light">
+      <section id="specs" className="py-20 bg-corp-gray">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
             <FadeUp>
-              <div className="font-mono text-lab-amber text-xs uppercase tracking-widest mb-3">// 02 Технические характеристики</div>
-              <h2 className="text-3xl md:text-4xl font-light text-white mb-8">Параметры <span className="text-lab-amber">точности</span></h2>
-
-              <div className="space-y-0 border border-lab-steel-muted/20 rounded-lg overflow-hidden">
+              <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Характеристики</div>
+              <h2 className="text-3xl md:text-4xl font-bold text-corp-text mb-8">Технические <span className="text-corp-red">параметры</span></h2>
+              <div className="bg-white rounded-xl border border-corp-gray-mid overflow-hidden shadow-sm">
                 {specs.map((s, i) => (
-                  <div key={i} className={`flex items-center justify-between px-5 py-3.5 ${i % 2 === 0 ? "bg-lab-navy" : "bg-lab-navy-light"} border-b border-lab-steel-muted/10 last:border-0`}>
-                    <span className="text-lab-steel text-sm">{s.param}</span>
-                    <span className="font-mono text-white text-sm text-right ml-4">{s.value}</span>
+                  <div key={i} className={`flex items-center justify-between px-5 py-3.5 text-sm ${i % 2 ? "bg-corp-gray/50" : "bg-white"} ${i < specs.length - 1 ? "border-b border-corp-gray-mid" : ""}`}>
+                    <span className="text-corp-text-light">{s.param}</span>
+                    <span className="font-semibold text-corp-text text-right ml-4">{s.value}</span>
                   </div>
                 ))}
               </div>
             </FadeUp>
 
-            <FadeUp delay={200}>
-              <div className="relative rounded-xl overflow-hidden">
-                <img src={LAB_IMAGE} alt="Лаборатория" className="w-full object-cover rounded-xl opacity-80" />
-                <div className="absolute inset-0 bg-gradient-to-t from-lab-navy/60 to-transparent rounded-xl" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="bg-lab-navy/80 backdrop-blur border border-lab-amber/30 rounded-lg p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                      <span className="font-mono text-xs text-lab-amber uppercase tracking-wider">Онлайн мониторинг</span>
-                    </div>
-                    <div className="font-mono text-white text-sm">η = 156.3 мПа·с @ 25.00 °C</div>
-                    <div className="text-lab-steel text-xs mt-1">Отклонение: ±0.08% · Статус: НОРМА</div>
+            <FadeUp delay={150}>
+              <div className="bg-white rounded-xl p-8 border border-corp-gray-mid shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-corp-red rounded-lg flex items-center justify-center">
+                    <Icon name="BadgeCheck" size={20} className="text-white" />
                   </div>
+                  <h3 className="font-bold text-xl text-corp-text">Сертификация</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {["ISO 9001:2015", "ISO/IEC 17025", "CE Marking", "EAC / ТР ТС", "ГОСТ Р / ФСА", "Госреестр СИ РФ"].map((cert) => (
+                    <div key={cert} className="flex items-center gap-2 bg-corp-gray rounded-lg px-3 py-3">
+                      <Icon name="CheckCircle2" size={16} className="text-corp-red flex-shrink-0" />
+                      <span className="text-sm font-medium text-corp-text">{cert}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 p-4 bg-corp-red/5 rounded-lg border border-corp-red/20">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-xs font-semibold text-corp-red uppercase tracking-wider">Все приборы в Госреестре СИ</span>
+                  </div>
+                  <p className="text-sm text-corp-text-light">Каждый вискозиметр проходит первичную поверку и сопровождается свидетельством государственного образца</p>
                 </div>
               </div>
             </FadeUp>
@@ -280,24 +302,23 @@ export default function Index() {
         </div>
       </section>
 
-      {/* APPLICATIONS */}
-      <section id="applications" className="py-24 bg-lab-navy">
+      <section id="applications" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <FadeUp className="mb-16">
-            <div className="font-mono text-lab-amber text-xs uppercase tracking-widest mb-3">// 03 Области применения</div>
-            <h2 className="text-3xl md:text-4xl font-light text-white">Где работают <span className="text-lab-amber">наши приборы</span></h2>
+          <FadeUp className="text-center mb-14">
+            <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Применение</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">Области <span className="text-corp-red">применения</span></h2>
           </FadeUp>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {applications.map((app, i) => (
-              <FadeUp key={i} delay={i * 80}>
-                <div className="group relative p-6 bg-lab-navy-light border border-lab-steel-muted/20 rounded-lg hover:border-lab-amber/30 transition-all duration-300 overflow-hidden h-full">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-lab-amber opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="flex items-center gap-3 mb-3">
-                    <Icon name={app.icon} size={20} className="text-lab-amber" />
-                    <h3 className="text-white font-semibold">{app.title}</h3>
+              <FadeUp key={i} delay={i * 70}>
+                <div className="group flex items-start gap-4 p-5 rounded-xl bg-corp-gray hover:bg-white hover:shadow-lg border border-transparent hover:border-corp-gray-mid transition-all duration-300 h-full">
+                  <div className="w-11 h-11 bg-corp-red/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-corp-red transition-colors duration-300">
+                    <Icon name={app.icon} size={20} className="text-corp-red group-hover:text-white transition-colors duration-300" />
                   </div>
-                  <p className="text-lab-steel text-sm leading-relaxed">{app.desc}</p>
+                  <div>
+                    <h3 className="text-corp-text font-bold mb-1">{app.title}</h3>
+                    <p className="text-corp-text-light text-sm leading-relaxed">{app.desc}</p>
+                  </div>
                 </div>
               </FadeUp>
             ))}
@@ -305,29 +326,25 @@ export default function Index() {
         </div>
       </section>
 
-      {/* CASES */}
-      <section id="cases" className="py-24 bg-lab-navy-light">
+      <section id="cases" className="py-20 bg-corp-dark">
         <div className="max-w-7xl mx-auto px-6">
-          <FadeUp className="mb-16">
-            <div className="font-mono text-lab-amber text-xs uppercase tracking-widest mb-3">// 04 Кейсы и результаты</div>
-            <h2 className="text-3xl md:text-4xl font-light text-white">Измеримые <span className="text-lab-amber">результаты</span></h2>
+          <FadeUp className="text-center mb-14">
+            <div className="text-corp-red-light text-sm font-semibold uppercase tracking-wider mb-2">Кейсы</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Результаты <span className="text-corp-red-light">наших клиентов</span></h2>
           </FadeUp>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {cases.map((c, i) => (
-              <FadeUp key={i} delay={i * 120}>
-                <div className="p-7 bg-lab-navy border border-lab-steel-muted/20 rounded-xl h-full flex flex-col">
-                  <div className="flex items-start justify-between mb-5">
-                    <div>
-                      <div className="text-white font-semibold text-sm mb-1">{c.org}</div>
-                      <div className="inline-block text-lab-amber text-xs font-mono bg-lab-amber/10 px-2 py-0.5 rounded">{c.segment}</div>
-                    </div>
+              <FadeUp key={i} delay={i * 100}>
+                <div className="bg-corp-dark-mid rounded-xl p-7 border border-white/10 hover:border-corp-red-light/30 transition-colors h-full flex flex-col">
+                  <div className="mb-4">
+                    <div className="text-white font-semibold text-sm">{c.org}</div>
+                    <div className="inline-block text-corp-red-light text-xs font-semibold bg-corp-red-light/10 px-2 py-0.5 rounded mt-1">{c.segment}</div>
                   </div>
                   <div className="mb-4">
-                    <div className="font-mono text-5xl font-medium text-lab-amber">{c.value}</div>
-                    <div className="text-lab-steel-light text-sm font-medium mt-1">{c.result}</div>
+                    <div className="text-5xl font-extrabold text-corp-red-light">{c.value}</div>
+                    <div className="text-white/80 text-sm font-medium mt-1">{c.result}</div>
                   </div>
-                  <p className="text-lab-steel text-sm leading-relaxed mt-auto">{c.desc}</p>
+                  <p className="text-white/50 text-sm leading-relaxed mt-auto">{c.desc}</p>
                 </div>
               </FadeUp>
             ))}
@@ -335,91 +352,74 @@ export default function Index() {
         </div>
       </section>
 
-      {/* CERTIFICATIONS BANNER */}
-      <section className="py-14 bg-lab-navy border-y border-lab-steel-muted/20">
+      <section id="order" className="py-20 bg-corp-gray">
         <div className="max-w-7xl mx-auto px-6">
-          <FadeUp>
-            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
-              <div className="text-lab-steel text-sm uppercase tracking-widest font-mono">Сертификации:</div>
-              {["ISO 9001:2015", "ISO/IEC 17025", "CE Marking", "EAC / ТР ТС", "ГОСТ Р / ФСА", "Госреестр СИ РФ"].map((cert) => (
-                <div key={cert} className="flex items-center gap-2 text-white">
-                  <Icon name="BadgeCheck" size={16} className="text-lab-amber" />
-                  <span className="font-mono text-sm">{cert}</span>
-                </div>
-              ))}
-            </div>
-          </FadeUp>
-        </div>
-      </section>
-
-      {/* ORDER FORM */}
-      <section id="order" className="py-24 bg-lab-navy-light">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14">
             <FadeUp>
-              <div className="font-mono text-lab-amber text-xs uppercase tracking-widest mb-3">// 05 Форма заказа</div>
-              <h2 className="text-3xl md:text-4xl font-light text-white mb-4">Запросить <span className="text-lab-amber">демонстрацию</span></h2>
-              <p className="text-lab-steel mb-8 leading-relaxed">Оставьте заявку — наш инженер свяжется с вами в течение одного рабочего дня, проведёт онлайн-демо и подберёт оптимальную конфигурацию.</p>
-
+              <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Демонстрация</div>
+              <h2 className="text-3xl md:text-4xl font-bold text-corp-text mb-4">Запросить <span className="text-corp-red">демо</span></h2>
+              <p className="text-corp-text-light mb-8 leading-relaxed">Оставьте заявку — наш инженер свяжется в течение рабочего дня, проведёт онлайн-демонстрацию и подберёт оптимальную конфигурацию.</p>
               <div className="space-y-4">
                 {[
-                  { icon: "Phone", text: "+7 (495) 000-00-00" },
-                  { icon: "Mail", text: "info@viskopro.ru" },
-                  { icon: "MapPin", text: "Москва, ул. Промышленная, 12с1" },
-                  { icon: "Clock", text: "Пн–Пт, 9:00–18:00 МСК" },
+                  { icon: "Phone", text: "+7 (495) 000-00-00", sub: "Горячая линия" },
+                  { icon: "Mail", text: "info@viskopro.ru", sub: "Email" },
+                  { icon: "MapPin", text: "Москва, ул. Промышленная, 12с1", sub: "Офис и шоурум" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 text-lab-steel">
-                    <div className="w-8 h-8 bg-lab-amber/10 rounded flex items-center justify-center flex-shrink-0">
-                      <Icon name={item.icon} size={16} className="text-lab-amber" />
+                  <div key={i} className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-corp-red/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon name={item.icon} size={18} className="text-corp-red" />
                     </div>
-                    <span className="text-sm">{item.text}</span>
+                    <div>
+                      <div className="text-corp-text font-semibold text-sm">{item.text}</div>
+                      <div className="text-corp-text-muted text-xs">{item.sub}</div>
+                    </div>
                   </div>
                 ))}
               </div>
             </FadeUp>
 
-            <FadeUp delay={200}>
+            <FadeUp delay={150}>
               {formSent ? (
-                <div className="flex flex-col items-center justify-center h-full text-center py-16">
-                  <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
-                    <Icon name="CheckCircle2" size={32} className="text-green-400" />
+                <div className="flex flex-col items-center justify-center h-full text-center bg-white rounded-xl p-12 shadow-sm border border-corp-gray-mid">
+                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4">
+                    <Icon name="CheckCircle2" size={36} className="text-green-500" />
                   </div>
-                  <h3 className="text-white text-xl font-semibold mb-2">Заявка отправлена</h3>
-                  <p className="text-lab-steel text-sm">Наш инженер свяжется с вами в течение рабочего дня</p>
+                  <h3 className="text-corp-text text-xl font-bold mb-2">Заявка отправлена!</h3>
+                  <p className="text-corp-text-light text-sm">Инженер свяжется с вами в течение рабочего дня</p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="bg-white rounded-xl p-8 shadow-sm border border-corp-gray-mid space-y-4">
                   {[
-                    { name: "name", label: "Имя и фамилия", type: "text", placeholder: "Иван Петров" },
-                    { name: "org", label: "Организация", type: "text", placeholder: "ООО «Лаборатория»" },
-                    { name: "phone", label: "Телефон", type: "tel", placeholder: "+7 (___) ___-__-__" },
-                    { name: "email", label: "Email", type: "email", placeholder: "ivan@lab.ru" },
-                  ].map((field) => (
-                    <div key={field.name}>
-                      <label className="block text-lab-steel text-xs uppercase tracking-wider mb-1.5 font-mono">{field.label}</label>
+                    { name: "name", label: "Имя и фамилия", type: "text", ph: "Иван Петров" },
+                    { name: "org", label: "Организация", type: "text", ph: "ООО «Лаборатория»" },
+                    { name: "phone", label: "Телефон", type: "tel", ph: "+7 (___) ___-__-__" },
+                    { name: "email", label: "Email", type: "email", ph: "ivan@lab.ru" },
+                  ].map((f) => (
+                    <div key={f.name}>
+                      <label className="block text-corp-text text-xs font-semibold uppercase tracking-wider mb-1.5">{f.label}</label>
                       <input
-                        type={field.type}
-                        placeholder={field.placeholder}
-                        value={formData[field.name as keyof typeof formData]}
-                        onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
-                        className="w-full bg-lab-navy border border-lab-steel-muted/30 rounded px-4 py-3 text-white text-sm placeholder-lab-steel-muted focus:outline-none focus:border-lab-amber transition-colors"
+                        type={f.type}
+                        placeholder={f.ph}
+                        value={formData[f.name as keyof typeof formData]}
+                        onChange={(e) => setFormData({ ...formData, [f.name]: e.target.value })}
+                        className="w-full border border-corp-gray-mid rounded-lg px-4 py-3 text-sm text-corp-text placeholder-corp-text-muted focus:outline-none focus:border-corp-red focus:ring-1 focus:ring-corp-red/20 transition-colors"
                       />
                     </div>
                   ))}
                   <div>
-                    <label className="block text-lab-steel text-xs uppercase tracking-wider mb-1.5 font-mono">Комментарий</label>
+                    <label className="block text-corp-text text-xs font-semibold uppercase tracking-wider mb-1.5">Комментарий</label>
                     <textarea
-                      placeholder="Опишите задачу или укажите интересующие модели..."
+                      placeholder="Опишите задачу или интересующие модели..."
                       rows={3}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full bg-lab-navy border border-lab-steel-muted/30 rounded px-4 py-3 text-white text-sm placeholder-lab-steel-muted focus:outline-none focus:border-lab-amber transition-colors resize-none"
+                      className="w-full border border-corp-gray-mid rounded-lg px-4 py-3 text-sm text-corp-text placeholder-corp-text-muted focus:outline-none focus:border-corp-red focus:ring-1 focus:ring-corp-red/20 transition-colors resize-none"
                     />
                   </div>
-                  <button type="submit" className="w-full bg-lab-amber text-lab-navy font-semibold py-4 rounded text-base hover:bg-lab-amber-light transition-all duration-200 hover:scale-[1.02]">
+                  <button type="submit" className="w-full bg-corp-red text-white font-bold py-3.5 rounded-lg hover:bg-corp-red-dark transition-all hover:scale-[1.01] text-sm">
                     Отправить заявку
                   </button>
-                  <p className="text-lab-steel-muted text-xs text-center">Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности</p>
+                  <p className="text-corp-text-muted text-xs text-center">Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности</p>
                 </form>
               )}
             </FadeUp>
@@ -427,29 +427,24 @@ export default function Index() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="py-24 bg-lab-navy">
-        <div className="max-w-4xl mx-auto px-6">
-          <FadeUp className="mb-16 text-center">
-            <div className="font-mono text-lab-amber text-xs uppercase tracking-widest mb-3">// 06 Частые вопросы</div>
-            <h2 className="text-3xl md:text-4xl font-light text-white">Вопросы <span className="text-lab-amber">и ответы</span></h2>
+      <section id="faq" className="py-20 bg-white">
+        <div className="max-w-3xl mx-auto px-6">
+          <FadeUp className="text-center mb-14">
+            <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">FAQ</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">Частые <span className="text-corp-red">вопросы</span></h2>
           </FadeUp>
-
           <div className="space-y-3">
             {faqs.map((faq, i) => (
-              <FadeUp key={i} delay={i * 60}>
-                <div className="border border-lab-steel-muted/20 rounded-lg overflow-hidden">
-                  <button
-                    className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-lab-navy-light/50 transition-colors"
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  >
-                    <span className="text-white font-medium pr-4">{faq.q}</span>
-                    <Icon name={openFaq === i ? "ChevronUp" : "ChevronDown"} size={18} className="text-lab-amber flex-shrink-0" />
+              <FadeUp key={i} delay={i * 50}>
+                <div className="border border-corp-gray-mid rounded-xl overflow-hidden bg-white">
+                  <button className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-corp-gray/50 transition-colors" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
+                    <span className="text-corp-text font-semibold pr-4 text-sm">{faq.q}</span>
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${openFaq === i ? "bg-corp-red text-white" : "bg-corp-gray text-corp-text-light"}`}>
+                      <Icon name={openFaq === i ? "Minus" : "Plus"} size={14} />
+                    </div>
                   </button>
                   {openFaq === i && (
-                    <div className="px-6 pb-4 text-lab-steel text-sm leading-relaxed border-t border-lab-steel-muted/20 pt-4">
-                      {faq.a}
-                    </div>
+                    <div className="px-6 pb-5 text-corp-text-light text-sm leading-relaxed border-t border-corp-gray-mid pt-4">{faq.a}</div>
                   )}
                 </div>
               </FadeUp>
@@ -458,31 +453,25 @@ export default function Index() {
         </div>
       </section>
 
-      {/* CONTACTS */}
-      <section id="contacts" className="py-24 bg-lab-navy-light border-t border-lab-steel-muted/20">
+      <section id="contacts" className="py-20 bg-corp-gray">
         <div className="max-w-7xl mx-auto px-6">
-          <FadeUp className="mb-12">
-            <div className="font-mono text-lab-amber text-xs uppercase tracking-widest mb-3">// 07 Контакты и поддержка</div>
-            <h2 className="text-3xl md:text-4xl font-light text-white">Техническая <span className="text-lab-amber">поддержка</span></h2>
+          <FadeUp className="text-center mb-14">
+            <div className="text-corp-red text-sm font-semibold uppercase tracking-wider mb-2">Контакты</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-corp-text">Свяжитесь <span className="text-corp-red">с нами</span></h2>
           </FadeUp>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: "HeadphonesIcon", title: "Горячая линия", lines: ["+7 (800) 000-00-00", "Бесплатно по России", "Пн–Пт 9:00–20:00"] },
-              { icon: "Wrench", title: "Сервисный центр", lines: ["Москва, Новосибирск, Казань", "Выезд инженера на объект", "Срок ремонта: 3–7 дней"] },
-              { icon: "BookOpen", title: "Документация", lines: ["База знаний онлайн 24/7", "Видеоинструкции", "Сертификаты и протоколы"] },
-            ].map((block, i) => (
-              <FadeUp key={i} delay={i * 100}>
-                <div className="p-6 bg-lab-navy border border-lab-steel-muted/20 rounded-xl h-full">
-                  <div className="w-10 h-10 bg-lab-amber/10 rounded flex items-center justify-center mb-4">
-                    <Icon name={block.icon} size={20} className="text-lab-amber" fallback="HelpCircle" />
+              { icon: "Headphones", title: "Горячая линия", lines: ["+7 (800) 000-00-00", "Бесплатно по России", "Пн–Пт 9:00–20:00"] },
+              { icon: "Wrench", title: "Сервисный центр", lines: ["Москва, Новосибирск, Казань", "Выезд инженера на объект", "Ремонт: 3–7 дней"] },
+              { icon: "BookOpen", title: "Документация", lines: ["База знаний 24/7", "Видеоинструкции", "Сертификаты и протоколы"] },
+            ].map((b, i) => (
+              <FadeUp key={i} delay={i * 80}>
+                <div className="bg-white rounded-xl p-6 border border-corp-gray-mid hover:shadow-lg transition-shadow h-full">
+                  <div className="w-12 h-12 bg-corp-red/10 rounded-xl flex items-center justify-center mb-4">
+                    <Icon name={b.icon} size={22} className="text-corp-red" />
                   </div>
-                  <h3 className="text-white font-semibold mb-3">{block.title}</h3>
-                  <div className="space-y-1.5">
-                    {block.lines.map((l, j) => (
-                      <div key={j} className="text-lab-steel text-sm">{l}</div>
-                    ))}
-                  </div>
+                  <h3 className="text-corp-text font-bold mb-3">{b.title}</h3>
+                  {b.lines.map((l, j) => <div key={j} className="text-corp-text-light text-sm mb-1">{l}</div>)}
                 </div>
               </FadeUp>
             ))}
@@ -490,25 +479,23 @@ export default function Index() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-lab-navy border-t border-lab-steel-muted/20 py-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-lab-amber rounded-sm flex items-center justify-center">
-              <Icon name="Gauge" size={14} className="text-lab-navy" />
+      <footer className="bg-corp-dark text-white/60 py-10">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-corp-red rounded-lg flex items-center justify-center">
+                <Icon name="Gauge" size={16} className="text-white" />
+              </div>
+              <span className="font-bold text-white text-base">ВИСКОПРО</span>
             </div>
-            <span className="font-mono text-white text-sm font-medium">ВИСКОПРО</span>
-          </div>
-          <div className="text-lab-steel-muted text-xs font-mono text-center">
-            © 2024 ВискоПро. Все права защищены. ИНН 7700000000
-          </div>
-          <div className="flex gap-5 text-xs text-lab-steel-muted">
-            <a href="#" className="hover:text-lab-amber transition-colors">Политика конфиденциальности</a>
-            <a href="#" className="hover:text-lab-amber transition-colors">Реквизиты</a>
+            <div className="text-xs text-center">© 2024 ВискоПро. Все права защищены. ИНН 7700000000</div>
+            <div className="flex gap-6 text-xs">
+              <a href="#" className="hover:text-corp-red-light transition-colors">Политика конфиденциальности</a>
+              <a href="#" className="hover:text-corp-red-light transition-colors">Реквизиты</a>
+            </div>
           </div>
         </div>
       </footer>
-
     </div>
   );
 }

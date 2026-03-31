@@ -20,7 +20,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'ibm': ['IBM Plex Sans', 'sans-serif'],
+				'ibm': ['Montserrat', 'sans-serif'],
 				'mono': ['IBM Plex Mono', 'monospace'],
 			},
 			colors: {
@@ -67,16 +67,18 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				lab: {
-					navy: '#0a0e1a',
-					'navy-light': '#0f1628',
-					'navy-mid': '#162040',
-					blue: '#1a3a6e',
-					amber: '#e8a020',
-					'amber-light': '#f0b840',
-					steel: '#8ba3c7',
-					'steel-light': '#b8cce0',
-					'steel-muted': '#4a6080',
+				corp: {
+					red: '#D32F2F',
+					'red-dark': '#B71C1C',
+					'red-light': '#EF5350',
+					dark: '#1a1a2e',
+					'dark-mid': '#2d2d44',
+					gray: '#f5f5f7',
+					'gray-mid': '#e8e8ec',
+					'gray-dark': '#6b7280',
+					'text': '#1e293b',
+					'text-light': '#475569',
+					'text-muted': '#94a3b8',
 				}
 			},
 			borderRadius: {
